@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Media Type Picker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #fafafa;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+
+    .picker { width: 100%; max-width: 620px; }
+
+    .question-label {
+      font-size: 12px;
+      color: #888;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 8px;
+    }
+
+    .question-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: #111;
+      margin-bottom: 16px;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px;
+      margin-bottom: 2rem;
+    }
+
+    .option-btn {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 14px 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.15s, background 0.15s;
+      color: #1a1a1a;
+    }
+
+    .option-btn:hover { border-color: #bbb; background: #f5f5f5; }
+
+    .option-btn.selected {
+      border: 2px solid #2f7ed8;
+      background: #eef5fd;
+      color: #0c447c;
+    }
+
+    .option-label { font-size: 13px; font-weight: 500; display: block; }
+
+    .option-sub {
+      font-size: 11px;
+      color: #999;
+      margin-top: 3px;
+      display: block;
+    }
+
+    .option-btn.selected .option-sub { color: #4a8ec2; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #ebebeb;
+      margin: 1.5rem 0;
+    }
+
+    .result-card {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 0.5rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .result-tag {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #185fa5;
+      background: #e6f1fb;
+      border-radius: 6px;
+      padding: 3px 10px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .result-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: #111;
+      margin-bottom: 6px;
+    }
+
+    .result-why {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .result-examples { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .example-pill {
+      font-size: 12px;
+      background: #f5f5f5;
+      border: 1px solid #e5e5e5;
+      border-radius: 20px;
+      padding: 4px 12px;
+      color: #666;
+    }
+
+    .reset-btn {
+      font-size: 13px;
+      color: #999;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+      margin-top: 1rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<div class="picker">
+  <div id="q1-section">
+    <p class="question-label">Step 1 of 2</p>
+    <p class="question-title">What do you want your audience to do?</p>
+    <div class="options-grid">
+      <button class="option-btn" onclick="selectGoal('feel')" id="goal-feel">
+        <span class="option-label">Feel something</span>
+        <span class="option-sub">emotion, empathy, mood</span>
+      </button>
+      <button class="option-btn" onclick="selectGoal('understand')" id="goal-understand">
+        <span class="option-label">Understand</span>
+        <span class="option-sub">concepts, processes</span>
+      </button>
+      <button class="option-btn" onclick="selectGoal('act')" id="goal-act">
+        <span class="option-label">Act / decide</span>
+        <span class="option-sub">click, buy, do</span>
+      </button>
+      <button class="option-btn" onclick="selectGoal('remember')" id="goal-remember">
+        <span class="option-label">Remember</span>
+        <span class="option-sub">recall later, share</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="q2-section" style="display:none;">
+    <hr class="divider">
+    <p class="question-label">Step 2 of 2</p>
+    <p class="question-title">Where will they experience it?</p>
+    <div class="options-grid">
+      <button class="option-btn" onclick="selectContext('live')" id="ctx-live">
+        <span class="option-label">Live presentation</span>
+        <span class="option-sub">you're speaking</span>
+      </button>
+      <button class="option-btn" onclick="selectContext('screen')" id="ctx-screen">
+        <span class="option-label">Digital / screen</span>
+        <span class="option-sub">web, app, email</span>
+      </button>
+      <button class="option-btn" onclick="selectContext('print')" id="ctx-print">
+        <span class="option-label">Print</span>
+        <span class="option-sub">paper, poster</span>
+      </button>
+      <button class="option-btn" onclick="selectContext('async')" id="ctx-async">
+        <span class="option-label">Shared async</span>
+        <span class="option-sub">doc, deck, report</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="result-section" style="display:none;"></div>
+</div>
+
+<script>
+const recommendations = {
+  feel: {
+    live:    { title: "Video + ambient audio", why: "Emotional storytelling works best when it moves — combine footage with sound to trigger a genuine reaction in the room.", examples: ["Short film clip", "Background music", "Timelapse", "Personal photo story"] },
+    screen:  { title: "Full-bleed image or video", why: "On screen, visuals that fill the frame bypass the rational brain. Let imagery speak before words.", examples: ["Hero image", "Autoplay video", "Cinemagraph", "Photo essay"] },
+    print:   { title: "Photography + typography", why: "On paper, a single powerful photo plus a bold headline is unbeatable for emotional impact.", examples: ["Magazine spread", "Poster", "Photo caption", "Pull quote"] },
+    async:   { title: "Narrative video or audio", why: "When people watch or listen alone, they're more emotionally open. A short personal video lands harder than a slide deck.", examples: ["Loom recording", "Podcast clip", "Voice note", "Animated story"] }
+  },
+  understand: {
+    live:    { title: "Diagram or live demo", why: "Explaining live? Visuals that reveal step-by-step keep the audience building a mental model with you.", examples: ["Flowchart", "Screen recording", "Whiteboard sketch", "Annotated screenshot"] },
+    screen:  { title: "Interactive chart or infographic", why: "Digital lets people explore at their own pace. Interactive charts let them pull the insight that matters to them.", examples: ["Scrollytelling", "Interactive map", "Zoomable diagram", "Explainer animation"] },
+    print:   { title: "Infographic", why: "Infographics pack process, hierarchy, and comparison into a scannable single sheet — the strongest print format for teaching.", examples: ["Step-by-step guide", "Comparison chart", "Labeled diagram", "Timeline"] },
+    async:   { title: "Annotated slides or explainer video", why: "Async learners need both visuals and context. A narrated walkthrough or well-annotated deck gives them both.", examples: ["Narrated Loom", "PDF with callouts", "Slide deck", "Written explainer with diagrams"] }
+  },
+  act: {
+    live:    { title: "Live poll or QR code", why: "Get them doing something right now. A QR code to a form or a live poll closes the gap between watching and acting.", examples: ["Mentimeter poll", "QR to sign-up", "Show of hands prompt", "Live Q&A tool"] },
+    screen:  { title: "Interactive embed or CTA button", why: "Digital is the home of action — embed the thing they should do directly in the content. Don't link away, embed it.", examples: ["Embedded form", "Clickable prototype", "Buy button", "Calculator widget"] },
+    print:   { title: "QR code + clear CTA", why: "Print can't be clicked, but a QR code bridges paper to action. One clear message, one code.", examples: ["Poster with QR", "Business card link", "Event flyer", "Direct mail piece"] },
+    async:   { title: "Fillable form or interactive doc", why: "Async action needs zero friction. A pre-filled form or a doc with checkboxes removes every excuse to delay.", examples: ["Google Form", "Notion checklist", "PDF form", "Embedded survey"] }
+  },
+  remember: {
+    live:    { title: "One bold visual + a verbal hook", why: "People remember one thing from a talk. Give them a single striking visual and a phrase that sticks.", examples: ["Hero stat slide", "Memorable metaphor image", "Repeatable slogan", "Mnemonic framework"] },
+    screen:  { title: "Shareable card or infographic", why: "Design for the screenshot. If a single image captures the whole idea, people will save and share it.", examples: ["Stat card", "Quote graphic", "Summary infographic", "Slide screenshot"] },
+    print:   { title: "Takeaway sheet or poster", why: "Something physical they keep is something they remember. A well-designed one-pager outlasts any digital file.", examples: ["Cheat sheet", "Reference poster", "Framework card", "Bookmark"] },
+    async:   { title: "Structured summary with visuals", why: "The combo that sticks: short written summary + a visual that anchors the key idea. Bullets alone don't lodge in memory.", examples: ["Email recap with image", "Summary slide deck", "Notion page with diagrams", "Visual report"] }
+  }
+};
+
+let selectedGoal = null;
+
+function selectGoal(goal) {
+  selectedGoal = goal;
+  document.querySelectorAll('[id^="goal-"]').forEach(b => b.classList.remove('selected'));
+  document.getElementById('goal-' + goal).classList.add('selected');
+  document.getElementById('q2-section').style.display = 'block';
+  document.getElementById('result-section').style.display = 'none';
+  document.querySelectorAll('[id^="ctx-"]').forEach(b => b.classList.remove('selected'));
+}
+
+function selectContext(ctx) {
+  document.querySelectorAll('[id^="ctx-"]').forEach(b => b.classList.remove('selected'));
+  document.getElementById('ctx-' + ctx).classList.add('selected');
+  showResult(selectedGoal, ctx);
+}
+
+function showResult(goal, ctx) {
+  const r = recommendations[goal][ctx];
+  const section = document.getElementById('result-section');
+  section.style.display = 'block';
+  section.innerHTML = `
+    <hr class="divider">
+    <div class="result-card">
+      <span class="result-tag">Recommended media</span>
+      <p class="result-title">${r.title}</p>
+      <p class="result-why">${r.why}</p>
+      <div class="result-examples">
+        ${r.examples.map(e => `<span class="example-pill">${e}</span>`).join('')}
+      </div>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">← Start over</button>
+  `;
+  section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function resetAll() {
+  selectedGoal = null;
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('q2-section').style.display = 'none';
+  document.getElementById('result-section').style.display = 'none';
+}
+</script>
+</body>
+</html>
